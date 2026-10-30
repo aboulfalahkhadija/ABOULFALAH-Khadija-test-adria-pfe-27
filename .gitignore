@@ -1,0 +1,29 @@
+# Target
+**/target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Node / Angular
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
