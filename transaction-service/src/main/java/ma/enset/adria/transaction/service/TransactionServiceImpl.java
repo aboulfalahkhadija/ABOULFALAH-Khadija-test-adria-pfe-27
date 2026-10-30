@@ -21,6 +21,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountFeignClient accountFeignClient;
+    private final TransactionEventProducer transactionEventProducer;
 
     @Value("${bank.transaction.max-amount:1000}")
     private BigDecimal maxAmount;
@@ -87,6 +88,9 @@ public class TransactionServiceImpl implements TransactionService {
         // Mise à jour du solde du compte après enregistrement
         accountFeignClient.debitAccount(accountId, Map.of("amount", amount.doubleValue()));
 
+        // Partie F : Après la persistance réussie d'une transaction, publier un événement dans bank.transactions.created avec accountId comme clé
+        transactionEventProducer.publishTransactionCreated(savedTx);
+
         return savedTx;
     }
 
@@ -140,6 +144,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         accountFeignClient.debitAccount(sourceAccountId, Map.of("amount", amount.doubleValue()));
         accountFeignClient.creditAccount(targetAccountId, Map.of("amount", amount.doubleValue()));
+
+        // Publication des événements Kafka pour les deux opérations du virement
+        transactionEventProducer.publishTransactionCreated(debitTx);
+        transactionEventProducer.publishTransactionCreated(creditTx);
 
         return List.of(debitTx, creditTx);
     }

@@ -2,6 +2,8 @@ package ma.enset.adria.transaction.web.rest;
 
 import lombok.RequiredArgsConstructor;
 import ma.enset.adria.transaction.domain.Transaction;
+import ma.enset.adria.transaction.domain.TransactionCreatedEvent;
+import ma.enset.adria.transaction.service.TransactionEventConsumer;
 import ma.enset.adria.transaction.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class TransactionRestController {
 
     private final TransactionService transactionService;
+    private final TransactionEventConsumer transactionEventConsumer;
 
     public record CreateTransactionRequest(
             UUID accountId,
@@ -38,6 +41,11 @@ public class TransactionRestController {
     @GetMapping
     public List<Transaction> getAllTransactions() {
         return transactionService.getAllTransactions();
+    }
+
+    @GetMapping("/events")
+    public List<TransactionCreatedEvent> getConsumedKafkaEvents() {
+        return transactionEventConsumer.getConsumedEvents();
     }
 
     @GetMapping("/{id}")

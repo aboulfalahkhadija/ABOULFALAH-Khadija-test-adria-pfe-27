@@ -4,6 +4,9 @@ server:
 bank:
   transaction:
     max-amount: 1000
+  kafka:
+    topic:
+      transactions-created: bank.transactions.created
 
 account:
   service:
