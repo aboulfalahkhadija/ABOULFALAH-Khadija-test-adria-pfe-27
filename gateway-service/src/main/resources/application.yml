@@ -1,0 +1,57 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    discovery:
+      enabled: true
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "http://localhost:4200"
+              - "*"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            max-age: 3600
+      routes:
+        - id: account-service-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/account-service/**
+          filters:
+            - StripPrefix=1
+        - id: transaction-service-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/transaction-service/**
+          filters:
+            - StripPrefix=1
+        - id: agent-ai-service-route
+          uri: http://localhost:8083
+          predicates:
+            - Path=/agent-ai-service/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
