@@ -1,0 +1,66 @@
+server:
+  port: 8082
+
+bank:
+  transaction:
+    max-amount: 1000
+
+account:
+  service:
+    url: http://localhost:8081
+
+spring:
+  application:
+    name: transaction-service
+  cloud:
+    discovery:
+      enabled: true
+    config:
+      enabled: false
+  ai:
+    mcp:
+      server:
+        protocol: streamable
+  datasource:
+    url: jdbc:h2:mem:transaction-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+
+eureka:
+  client:
+    enabled: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      accountServiceCB:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
